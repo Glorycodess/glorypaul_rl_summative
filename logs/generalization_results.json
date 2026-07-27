@@ -1,0 +1,22 @@
+{
+  "dqn": {
+    "avg_reward": -924.5933333333367,
+    "avg_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  "ppo": {
+    "avg_reward": -986.01666666667,
+    "avg_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  "a2c": {
+    "avg_reward": -1073.156666666669,
+    "avg_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  "reinforce": {
+    "avg_reward": -1345.6033333333326,
+    "avg_length": 500.0,
+    "gridlock_rate": 0.0
+  }
+}

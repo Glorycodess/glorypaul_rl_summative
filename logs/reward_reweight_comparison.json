@@ -1,0 +1,23 @@
+{
+  "old_model_old_weights": {
+    "avg_eval_reward": -783.6080000000029,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0,
+    "avg_switches_per_episode": 180.22
+  },
+  "old_model_new_weights": {
+    "avg_eval_reward": -3515.2939999999867,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0,
+    "avg_switches_per_episode": 181.08
+  },
+  "new_model_new_weights": {
+    "avg_eval_reward": -3336.809999999999,
+    "avg_eval_length": 496.2,
+    "gridlock_rate": 0.04,
+    "avg_switches_per_episode": 78.7
+  },
+  "training_seconds": 14.410933017730713,
+  "timesteps": 50000,
+  "eval_episodes": 50
+}

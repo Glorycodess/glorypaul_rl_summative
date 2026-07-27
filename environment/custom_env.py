@@ -44,20 +44,27 @@ class TrafficSignalEnv(gym.Env):
         }
 
         self.wait_weight = 0.1
-        self.switch_penalty = 5.0
-        self.all_red_penalty = 8.0
+        self.switch_penalty = 20.0
+        self.all_red_penalty = 25.0
         self.clear_bonus = 2.0
 
         self.gridlock_threshold = 20
         self.max_steps = 500
 
-    def reset(self, seed=None, options=None):
+    def reset(self, seed=None, options=None, randomize_start=False):
         super().reset(seed=seed)
 
-        self.queues = {d: [] for d in self.directions}
         self.current_step = 0
         self.current_phase = 0
         self.time_in_phase = 0
+
+        if randomize_start:
+            self.queues = {
+                d: [self.current_step] * int(self.np_random.integers(0, 9))
+                for d in self.directions
+            }
+        else:
+            self.queues = {d: [] for d in self.directions}
 
         return self._get_observation(), {}
 

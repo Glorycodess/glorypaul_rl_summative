@@ -16,7 +16,7 @@ import argparse
 import os
 
 from environment.custom_env import TrafficSignalEnv
-from environment.rendering import TrafficRenderer
+from environment.rendering import TrafficRenderer, DEFAULT_LIVE_FPS
 
 RENDER_DIR = os.path.join(os.path.dirname(__file__), "..", "logs", "renders")
 
@@ -29,7 +29,11 @@ def check_camera_framing(renderer):
 
 
 def check_signals_and_vehicles(renderer):
-    renderer.update_vehicles({"N": 5, "S": 2, "E": 8, "W": 1})
+    renderer.reset_vehicles()
+    renderer.reconcile_vehicles({"N": 5, "S": 2, "E": 8, "W": 1})
+    for _ in range(80):
+        renderer.step_vehicles(1.0 / DEFAULT_LIVE_FPS, 4)
+
     for action in (0, 1, 2, 3, 4):
         renderer.set_signal_state(action)
         assert set(renderer.signal_lights.keys()) == {"N", "S", "E", "W"}
@@ -66,7 +70,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--live", action="store_true", help="open an interactive window and play a random-policy episode")
     parser.add_argument("--capture", action="store_true", help="headless run that also dumps per-step screenshots")
-    parser.add_argument("--fps", type=int, default=10, help="playback frame rate for --live mode")
+    parser.add_argument("--fps", type=int, default=DEFAULT_LIVE_FPS, help="playback frame rate for --live mode")
     args = parser.parse_args()
 
     os.makedirs(RENDER_DIR, exist_ok=True)

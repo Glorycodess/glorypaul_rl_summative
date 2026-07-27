@@ -1,11 +1,14 @@
-import random
 import time
+import random
 
+from direct.gui.DirectGui import DirectFrame
+from direct.gui.OnscreenText import OnscreenText
 from direct.showbase.ShowBase import ShowBase
 from panda3d.core import (
     CardMaker,
     AmbientLight,
     DirectionalLight,
+    TextNode,
     Vec4,
     Filename,
     loadPrcFileData,
@@ -17,31 +20,42 @@ from panda3d.core import (
     GeomNode,
 )
 
-ROAD_HALF_WIDTH = 2.0
-ROAD_LENGTH = 70.0
-GROUND_SIZE = 220.0
+ROAD_HALF_WIDTH = 4.2
+ROAD_LENGTH = 90.0
+GROUND_SIZE = 320.0
+
+LANE_OFFSET = 2.5
 
 DIRECTIONS = ["N", "S", "E", "W"]
 
-# Mirrors TrafficSignalEnv.phase_directions in custom_env.py.
 PHASE_DIRECTIONS = {
-    0: ["N", "S"],   # NS-through
-    1: ["E", "W"],   # EW-through
-    2: ["N", "S"],   # NS-left
-    3: ["E", "W"],   # EW-left
-    4: [],           # all-red
+    0: ["N", "S"],
+    1: ["E", "W"],
+    2: ["N", "S"],
+    3: ["E", "W"],
+    4: [],
 }
 
-RED = (0.8, 0.05, 0.05, 1)
-GREEN = (0.05, 0.75, 0.15, 1)
+RED = (1.0, 0.0, 0.0, 1)
+GREEN = (0.0, 0.95, 0.1, 1)
 
-# Cars are built at this base size, then scaled up uniformly by CAR_SCALE so
-# body/cabin/wheel proportions established below stay correct at any size.
+SIGNAL_LIGHT_SIZE = 1.4
+SIGNAL_HOUSING_SIZE = SIGNAL_LIGHT_SIZE + 0.4
+SIGNAL_POLE_HEIGHT = 6.0
+
 CAR_SCALE = 1.35
 
-QUEUE_START_OFFSET = ROAD_HALF_WIDTH + 4.0
-QUEUE_SPACING = 3.6
 MAX_RENDERED_QUEUE = 7
+MAX_RENDERED_DEPARTING = 10
+
+STOP_LINE_DIST = ROAD_HALF_WIDTH + 5.5
+FOLLOW_GAP = 4.2
+SPAWN_DIST = ROAD_LENGTH / 2.0 - 2.0
+EXIT_DIST = -(ROAD_LENGTH / 2.0 - 3.0)
+MAX_SPEED = 9.0
+ACCEL = 6.0
+DECEL = 9.0
+SPAWN_SPEED = MAX_SPEED * 0.6
 
 CAR_COLORS = [
     (0.9, 0.05, 0.05, 1),
@@ -52,7 +66,6 @@ CAR_COLORS = [
     (0.55, 0.15, 0.75, 1),
 ]
 
-# Degrees so each car faces its direction of travel.
 CAR_HEADING = {"N": 0, "S": 180, "E": 90, "W": -90}
 
 SIDEWALK_WIDTH = 1.6
@@ -69,6 +82,18 @@ BUILDING_COLORS = [
     (0.5, 0.45, 0.4, 1),
     (0.35, 0.5, 0.45, 1),
 ]
+
+DEFAULT_LIVE_FPS = 10
+
+PHASE_NAMES = {0: "NS-THROUGH", 1: "EW-THROUGH", 2: "NS-LEFT", 3: "EW-LEFT", 4: "ALL-RED"}
+
+HUD_BG_COLOR = (0.05, 0.05, 0.08, 0.65)
+HUD_TEXT_COLOR = (0.95, 0.95, 0.95, 1)
+HUD_GREEN = (0.3, 0.9, 0.35, 1)
+HUD_RED = (0.95, 0.3, 0.3, 1)
+HUD_WARNING_COLOR = (0.95, 0.65, 0.1, 1)
+
+HUD_WARNING_FRACTION = 0.75
 
 
 def _build_box_geom(sx, sy, sz):
@@ -105,6 +130,21 @@ def _build_box_geom(sx, sy, sz):
     return node
 
 
+class _Vehicle:
+    """A persistent, continuously-moving car. `dist` is signed distance from
+    the intersection center along its direction's approach axis. `state` is
+    "approaching" (still part of the queue, driving up to or waiting at the
+    stop line) or "departing" (released, driving through and away)."""
+
+    __slots__ = ("node", "dist", "speed", "state")
+
+    def __init__(self, node, dist, speed, state):
+        self.node = node
+        self.dist = dist
+        self.speed = speed
+        self.state = state
+
+
 class TrafficRenderer(ShowBase):
     def __init__(self, headless=False, window_size=(1280, 720)):
         if headless:
@@ -125,13 +165,17 @@ class TrafficRenderer(ShowBase):
         self._build_streetlights()
         self._build_buildings()
         self._build_signals()
+        self._build_hud()
 
-        self.vehicle_nodes = {d: [] for d in DIRECTIONS}
+        self.vehicles = {d: [] for d in DIRECTIONS}
+        self._next_color_index = 0
+        self.episode_num = 0
+        self.episode_reward = 0.0
 
     def _setup_camera(self):
         self.camLens.setFov(50)
         self.camLens.setNearFar(1.0, 500.0)
-        self.camera.setPos(0, -74, 50)
+        self.camera.setPos(0, -110, 76)
         self.camera.lookAt(0, 0, 0)
 
     def _setup_lighting(self):
@@ -263,17 +307,22 @@ class TrafficRenderer(ShowBase):
         return np_
 
     def _build_signals(self):
-        stalk = ROAD_HALF_WIDTH + 0.6
+        stalk = ROAD_HALF_WIDTH + 1.5
+        median_offset = 0.35
         specs = {
-            "N": (1.0, stalk),
-            "S": (-1.0, -stalk),
-            "E": (stalk, -1.0),
-            "W": (-stalk, 1.0),
+            "N": (-median_offset, stalk),
+            "S": (median_offset, -stalk),
+            "E": (stalk, -median_offset),
+            "W": (-stalk, median_offset),
         }
+        housing_z = SIGNAL_POLE_HEIGHT + SIGNAL_HOUSING_SIZE / 2.0
+        light_z = SIGNAL_POLE_HEIGHT + SIGNAL_HOUSING_SIZE + SIGNAL_LIGHT_SIZE / 2.0
+
         self.signal_lights = {}
         for d, (x, y) in specs.items():
-            self.make_box(self.render, 0.15, 0.15, 3.0, (0.25, 0.25, 0.25, 1), pos=(x, y, 1.5))
-            light = self.make_box(self.render, 0.5, 0.5, 0.5, RED, pos=(x, y, 3.2))
+            self.make_box(self.render, 0.3, 0.3, SIGNAL_POLE_HEIGHT, (0.15, 0.15, 0.15, 1), pos=(x, y, SIGNAL_POLE_HEIGHT / 2.0))
+            self.make_box(self.render, SIGNAL_HOUSING_SIZE, SIGNAL_HOUSING_SIZE, SIGNAL_HOUSING_SIZE, (0.08, 0.08, 0.08, 1), pos=(x, y, housing_z))
+            light = self.make_box(self.render, SIGNAL_LIGHT_SIZE, SIGNAL_LIGHT_SIZE, SIGNAL_LIGHT_SIZE, RED, pos=(x, y, light_z))
             self.signal_lights[d] = light
 
     def set_signal_state(self, action):
@@ -281,29 +330,115 @@ class TrafficRenderer(ShowBase):
         for d, node in self.signal_lights.items():
             node.setColor(*(GREEN if d in green_dirs else RED))
 
-    def _queue_position(self, direction, index):
-        offset = QUEUE_START_OFFSET + index * QUEUE_SPACING
+    def _make_2d_rect(self, parent, x, z, width, height, color):
+        cm = CardMaker("hud_rect")
+        cm.setFrame(0, 1, -height / 2, height / 2)
+        node = parent.attachNewNode(cm.generate())
+        node.setPos(x, 0, z)
+        node.setScale(max(width, 0.001), 1, 1)
+        node.setColor(*color)
+        return node
+
+    def _build_hud(self):
+        panel_left, panel_right = -1.78, -0.58
+        panel_top, panel_bottom = 1.0, 0.06
+
+        self.hud_root = self.aspect2d.attachNewNode("hud")
+
+        DirectFrame(
+            parent=self.hud_root,
+            frameColor=HUD_BG_COLOR,
+            frameSize=(panel_left, panel_right, panel_bottom, panel_top),
+            pos=(0, 0, 0),
+        )
+
+        text_x = panel_left + 0.08
+        line_height = 0.08
+        y = [panel_top - 0.11]
+
+        def add_line(scale=0.05, fg=HUD_TEXT_COLOR):
+            node = OnscreenText(
+                text="",
+                pos=(text_x, y[0]),
+                scale=scale,
+                fg=fg,
+                align=TextNode.ALeft,
+                mayChange=True,
+                parent=self.hud_root,
+            )
+            y[0] -= line_height
+            return node
+
+        self.hud_step_text = add_line()
+        self.hud_phase_text = add_line()
+
+        y[0] -= 0.02
+        bar_x = text_x + 0.34
+        self.hud_bar_max_width = panel_right - bar_x - 0.08
+        bar_height = 0.04
+
+        self.hud_queue_texts = {}
+        self.hud_bar_fills = {}
+        for d in DIRECTIONS:
+            line_y = y[0]
+            self.hud_queue_texts[d] = add_line(scale=0.048)
+            self._make_2d_rect(self.hud_root, bar_x, line_y + 0.015, self.hud_bar_max_width, bar_height, (0.3, 0.3, 0.3, 0.8))
+            self.hud_bar_fills[d] = self._make_2d_rect(self.hud_root, bar_x, line_y + 0.015, 0.001, bar_height, HUD_GREEN)
+
+        y[0] -= 0.02
+        self.hud_step_reward_text = add_line(scale=0.048)
+        self.hud_episode_reward_text = add_line(scale=0.048)
+
+        y[0] -= 0.02
+        self.hud_status_text = add_line(scale=0.052, fg=HUD_GREEN)
+
+    def _update_hud(self, observation, action, step_count, max_steps, reward, gridlock_threshold):
+        queue_lengths = {d: observation[i] for i, d in enumerate(DIRECTIONS)}
+        green_dirs = PHASE_DIRECTIONS.get(int(action), [])
+
+        self.hud_step_text.setText(f"Step: {step_count} / {max_steps}    Episode: {self.episode_num}")
+
+        self.hud_phase_text.setText(f"Phase: {PHASE_NAMES.get(int(action), '?')}")
+        self.hud_phase_text.setFg(HUD_RED if int(action) == 4 else HUD_GREEN)
+
+        max_queue = 0
+        for d in DIRECTIONS:
+            q = int(queue_lengths[d])
+            max_queue = max(max_queue, q)
+            color = HUD_GREEN if d in green_dirs else HUD_RED
+            self.hud_queue_texts[d].setText(f"{d}: {q}")
+            self.hud_queue_texts[d].setFg(color)
+            fraction = min(q / gridlock_threshold, 1.0)
+            self.hud_bar_fills[d].setSx(max(self.hud_bar_max_width * fraction, 0.001))
+            self.hud_bar_fills[d].setColor(*color)
+
+        self.hud_step_reward_text.setText(f"Step Reward: {reward:.1f}")
+        self.hud_episode_reward_text.setText(f"Episode Reward: {self.episode_reward:.1f}")
+
+        if max_queue >= HUD_WARNING_FRACTION * gridlock_threshold:
+            self.hud_status_text.setText("STATUS: WARNING - APPROACHING GRIDLOCK")
+            self.hud_status_text.setFg(HUD_WARNING_COLOR)
+        else:
+            self.hud_status_text.setText("STATUS: NORMAL")
+            self.hud_status_text.setFg(HUD_GREEN)
+
+    def _position_for(self, direction, dist):
         if direction == "N":
-            return (-1.0, offset, 0.35)
+            return (-LANE_OFFSET, dist, 0.35)
         if direction == "S":
-            return (1.0, -offset, 0.35)
+            return (LANE_OFFSET, -dist, 0.35)
         if direction == "E":
-            return (offset, -1.0, 0.35)
-        return (-offset, 1.0, 0.35)
+            return (dist, -LANE_OFFSET, 0.35)
+        return (-dist, LANE_OFFSET, 0.35)
 
-    def _make_car(self, direction, index):
-        color = CAR_COLORS[index % len(CAR_COLORS)]
-        car = self.render.attachNewNode(f"car_{direction}_{index}")
+    def _make_car(self, direction, color_index):
+        color = CAR_COLORS[color_index % len(CAR_COLORS)]
+        car = self.render.attachNewNode(f"car_{direction}_{color_index}")
 
-        # Full-length lower chassis (hood + trunk).
         self.make_box(car, 1.1, 2.3, 0.5, color, pos=(0, 0, 0.28))
 
-        # Cabin is shorter than the chassis and offset toward the front, so
-        # hood/trunk stay exposed and the silhouette reads as a car rather
-        # than a stacked two-tier block.
         self.make_box(car, 0.85, 1.15, 0.5, color, pos=(0, -0.15, 0.78))
 
-        # Windshield: dark box pitched forward to suggest sloped glass.
         windshield = self.make_box(
             car, 0.75, 0.08, 0.42, (0.08, 0.08, 0.1, 1), pos=(0, -0.73, 0.63)
         )
@@ -323,28 +458,121 @@ class TrafficRenderer(ShowBase):
         car.setScale(CAR_SCALE)
         return car
 
-    def update_vehicles(self, queue_lengths):
+    def reset_vehicles(self):
         for d in DIRECTIONS:
-            desired = min(int(queue_lengths[d]), MAX_RENDERED_QUEUE)
-            nodes = self.vehicle_nodes[d]
-            while len(nodes) < desired:
-                nodes.append(self._make_car(d, len(nodes)))
-            while len(nodes) > desired:
-                nodes.pop().removeNode()
-            for i, node in enumerate(nodes):
-                node.setPos(*self._queue_position(d, i))
+            for v in self.vehicles[d]:
+                v.node.removeNode()
+            self.vehicles[d] = []
 
-    def sync(self, observation, action):
+    def _spawn_vehicle(self, direction, dist):
+        color_index = self._next_color_index
+        self._next_color_index += 1
+        node = self._make_car(direction, color_index)
+        vehicle = _Vehicle(node, dist, SPAWN_SPEED, "approaching")
+        node.setPos(*self._position_for(direction, dist))
+        self.vehicles[direction].append(vehicle)
+
+    def reconcile_vehicles(self, queue_lengths):
+        """Spawns/releases vehicles so the count still "approaching" (i.e.
+        not yet released through the intersection) matches the env's true
+        queue length for that direction. Only the net per-step delta is
+        observable (the env doesn't expose arrivals/clearances separately),
+        so a step with simultaneous arrivals and clearances that happen to
+        cancel out won't visibly spawn or release anything -- the count
+        stays correct, individual vehicle identity is a best-effort
+        visualization on top of that.
+        """
+        for d in DIRECTIONS:
+            approaching = [v for v in self.vehicles[d] if v.state == "approaching"]
+            delta = int(queue_lengths[d]) - len(approaching)
+
+            if delta > 0:
+                room = MAX_RENDERED_QUEUE - len(approaching)
+                back_dist = max((v.dist for v in self.vehicles[d]), default=SPAWN_DIST - FOLLOW_GAP)
+                for _ in range(max(0, min(delta, room))):
+                    spawn_dist = max(SPAWN_DIST, back_dist + FOLLOW_GAP)
+                    self._spawn_vehicle(d, spawn_dist)
+                    back_dist = spawn_dist
+            elif delta < 0:
+                approaching.sort(key=lambda v: v.dist)
+                departing_count = sum(1 for v in self.vehicles[d] if v.state == "departing")
+                for v in approaching[: min(-delta, len(approaching))]:
+                    if departing_count >= MAX_RENDERED_DEPARTING:
+                        v.node.removeNode()
+                        self.vehicles[d].remove(v)
+                    else:
+                        v.state = "departing"
+                        departing_count += 1
+
+    def step_vehicles(self, dt, action):
+        served = set(PHASE_DIRECTIONS.get(int(action), []))
+
+        for d in DIRECTIONS:
+            direction_served = d in served
+            vehicles = self.vehicles[d]
+            vehicles.sort(key=lambda v: v.dist)
+
+            kept = []
+            ahead_dist = None
+            for v in vehicles:
+                committed = v.dist < STOP_LINE_DIST
+                if committed and v.state == "approaching":
+                    v.state = "departing"
+                must_hold = not committed and not direction_served
+
+                follow_target = ahead_dist + FOLLOW_GAP if ahead_dist is not None else None
+                stop_target = STOP_LINE_DIST if must_hold else None
+                if follow_target is not None and stop_target is not None:
+                    target = max(follow_target, stop_target)
+                else:
+                    target = follow_target if follow_target is not None else stop_target
+
+                if target is None:
+                    v.speed = min(v.speed + ACCEL * dt, MAX_SPEED)
+                else:
+                    gap_remaining = v.dist - target
+                    braking_distance = (v.speed ** 2) / (2 * DECEL)
+                    if gap_remaining <= braking_distance:
+                        v.speed = max(v.speed - DECEL * dt, 0.0)
+                    else:
+                        v.speed = min(v.speed + ACCEL * dt, MAX_SPEED)
+
+                new_dist = v.dist - v.speed * dt
+                if target is not None and new_dist < target:
+                    new_dist = target
+                new_dist = min(new_dist, v.dist)
+                if target is not None and new_dist <= target:
+                    v.speed = 0.0
+                v.dist = new_dist
+                v.node.setPos(*self._position_for(d, v.dist))
+                ahead_dist = v.dist
+
+                if v.dist < EXIT_DIST:
+                    v.node.removeNode()
+                else:
+                    kept.append(v)
+
+            self.vehicles[d] = kept
+
+    def sync(self, observation, action, dt):
         queue_lengths = {d: observation[i] for i, d in enumerate(DIRECTIONS)}
-        self.update_vehicles(queue_lengths)
+        self.reconcile_vehicles(queue_lengths)
+        self.step_vehicles(dt, action)
         self.set_signal_state(action)
         self.graphicsEngine.renderFrame()
 
-    def run_episode(self, env, policy=None, max_steps=500, fps=10, screenshot_dir=None, screenshot_every=1):
+    def run_episode(self, env, policy=None, max_steps=500, fps=DEFAULT_LIVE_FPS, screenshot_dir=None, screenshot_every=1):
         import os
 
+        self.episode_num += 1
+        self.episode_reward = 0.0
+        self.reset_vehicles()
+
+        dt = 1.0 / (fps if fps else DEFAULT_LIVE_FPS)
+
         obs, _info = env.reset()
-        self.sync(obs, 4)
+        self._update_hud(obs, 4, 0, max_steps, 0.0, env.gridlock_threshold)
+        self.sync(obs, 4, dt)
 
         frame_interval = (1.0 / fps) if (fps and not self.headless) else 0.0
         if screenshot_dir:
@@ -357,8 +585,11 @@ class TrafficRenderer(ShowBase):
         while True:
             action = policy(obs) if policy is not None else env.action_space.sample()
             obs, reward, terminated, truncated, info = env.step(action)
-            self.sync(obs, action)
             step_count += 1
+            self.episode_reward += reward
+
+            self._update_hud(obs, action, step_count, max_steps, reward, env.gridlock_threshold)
+            self.sync(obs, action, dt)
 
             if screenshot_dir and step_count % screenshot_every == 0:
                 self.screenshot(os.path.join(screenshot_dir, f"frame_{step_count:04d}.png"))

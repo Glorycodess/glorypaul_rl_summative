@@ -1,0 +1,602 @@
+[
+  {
+    "global_run": 1,
+    "algorithm": "dqn",
+    "algo_run": 1,
+    "params": {
+      "lr": 0.0001,
+      "gamma": 0.95
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -927.3500000000015,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 2,
+    "algorithm": "dqn",
+    "algo_run": 2,
+    "params": {
+      "lr": 0.0003,
+      "gamma": 0.95
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -884.9700000000024,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 3,
+    "algorithm": "dqn",
+    "algo_run": 3,
+    "params": {
+      "lr": 0.0005,
+      "gamma": 0.95
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -803.4850000000026,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 4,
+    "algorithm": "dqn",
+    "algo_run": 4,
+    "params": {
+      "lr": 0.001,
+      "gamma": 0.95
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -740.4850000000026,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 5,
+    "algorithm": "dqn",
+    "algo_run": 5,
+    "params": {
+      "lr": 0.005,
+      "gamma": 0.95
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -770.3000000000023,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 6,
+    "algorithm": "dqn",
+    "algo_run": 6,
+    "params": {
+      "lr": 0.0001,
+      "gamma": 0.99
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -881.3900000000027,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 7,
+    "algorithm": "dqn",
+    "algo_run": 7,
+    "params": {
+      "lr": 0.0003,
+      "gamma": 0.99
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -779.4250000000027,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 8,
+    "algorithm": "dqn",
+    "algo_run": 8,
+    "params": {
+      "lr": 0.0005,
+      "gamma": 0.99
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -799.7850000000028,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 9,
+    "algorithm": "dqn",
+    "algo_run": 9,
+    "params": {
+      "lr": 0.001,
+      "gamma": 0.99
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -775.4700000000025,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 10,
+    "algorithm": "dqn",
+    "algo_run": 10,
+    "params": {
+      "lr": 0.005,
+      "gamma": 0.99
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -864.330000000002,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 11,
+    "algorithm": "ppo",
+    "algo_run": 1,
+    "params": {
+      "lr": 0.0001,
+      "clip": 0.1
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -1109.4400000000005,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 12,
+    "algorithm": "ppo",
+    "algo_run": 2,
+    "params": {
+      "lr": 0.0003,
+      "clip": 0.1
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -991.8800000000014,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 13,
+    "algorithm": "ppo",
+    "algo_run": 3,
+    "params": {
+      "lr": 0.0005,
+      "clip": 0.1
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -921.6100000000018,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 14,
+    "algorithm": "ppo",
+    "algo_run": 4,
+    "params": {
+      "lr": 0.001,
+      "clip": 0.1
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -903.3850000000027,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 15,
+    "algorithm": "ppo",
+    "algo_run": 5,
+    "params": {
+      "lr": 0.005,
+      "clip": 0.1
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -1073.5500000000015,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 16,
+    "algorithm": "ppo",
+    "algo_run": 6,
+    "params": {
+      "lr": 0.0001,
+      "clip": 0.3
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -883.2400000000025,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 17,
+    "algorithm": "ppo",
+    "algo_run": 7,
+    "params": {
+      "lr": 0.0003,
+      "clip": 0.3
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -767.970000000003,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 18,
+    "algorithm": "ppo",
+    "algo_run": 8,
+    "params": {
+      "lr": 0.0005,
+      "clip": 0.3
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -824.875000000003,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 19,
+    "algorithm": "ppo",
+    "algo_run": 9,
+    "params": {
+      "lr": 0.001,
+      "clip": 0.3
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -776.5300000000024,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 20,
+    "algorithm": "ppo",
+    "algo_run": 10,
+    "params": {
+      "lr": 0.005,
+      "clip": 0.3
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -5132.064999999999,
+    "avg_eval_length": 345.35,
+    "gridlock_rate": 0.6
+  },
+  {
+    "global_run": 21,
+    "algorithm": "a2c",
+    "algo_run": 1,
+    "params": {
+      "lr": 0.0001,
+      "n_steps": 5
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -2080.4900000000002,
+    "avg_eval_length": 45.95,
+    "gridlock_rate": 1.0
+  },
+  {
+    "global_run": 22,
+    "algorithm": "a2c",
+    "algo_run": 2,
+    "params": {
+      "lr": 0.0003,
+      "n_steps": 5
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -2396.695,
+    "avg_eval_length": 48.55,
+    "gridlock_rate": 1.0
+  },
+  {
+    "global_run": 23,
+    "algorithm": "a2c",
+    "algo_run": 3,
+    "params": {
+      "lr": 0.0005,
+      "n_steps": 5
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -901.3950000000029,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 24,
+    "algorithm": "a2c",
+    "algo_run": 4,
+    "params": {
+      "lr": 0.001,
+      "n_steps": 5
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -4028.825,
+    "avg_eval_length": 56.4,
+    "gridlock_rate": 1.0
+  },
+  {
+    "global_run": 25,
+    "algorithm": "a2c",
+    "algo_run": 5,
+    "params": {
+      "lr": 0.005,
+      "n_steps": 5
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -886.4350000000024,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 26,
+    "algorithm": "a2c",
+    "algo_run": 6,
+    "params": {
+      "lr": 0.0001,
+      "n_steps": 20
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -2393.8500000000004,
+    "avg_eval_length": 48.2,
+    "gridlock_rate": 1.0
+  },
+  {
+    "global_run": 27,
+    "algorithm": "a2c",
+    "algo_run": 7,
+    "params": {
+      "lr": 0.0003,
+      "n_steps": 20
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -5525.765,
+    "avg_eval_length": 458.05,
+    "gridlock_rate": 0.25
+  },
+  {
+    "global_run": 28,
+    "algorithm": "a2c",
+    "algo_run": 8,
+    "params": {
+      "lr": 0.0005,
+      "n_steps": 20
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -1948.8299999999967,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 29,
+    "algorithm": "a2c",
+    "algo_run": 9,
+    "params": {
+      "lr": 0.001,
+      "n_steps": 20
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -4576.555,
+    "avg_eval_length": 146.8,
+    "gridlock_rate": 1.0
+  },
+  {
+    "global_run": 30,
+    "algorithm": "a2c",
+    "algo_run": 10,
+    "params": {
+      "lr": 0.005,
+      "n_steps": 20
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -3756.915,
+    "avg_eval_length": 43.3,
+    "gridlock_rate": 1.0
+  },
+  {
+    "global_run": 31,
+    "algorithm": "reinforce",
+    "algo_run": 1,
+    "params": {
+      "lr": 0.0001,
+      "gamma": 0.95
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -5735.219999999997,
+    "avg_eval_length": 458.45,
+    "gridlock_rate": 0.2
+  },
+  {
+    "global_run": 32,
+    "algorithm": "reinforce",
+    "algo_run": 2,
+    "params": {
+      "lr": 0.0003,
+      "gamma": 0.95
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -2619.0950000000003,
+    "avg_eval_length": 60.35,
+    "gridlock_rate": 1.0
+  },
+  {
+    "global_run": 33,
+    "algorithm": "reinforce",
+    "algo_run": 3,
+    "params": {
+      "lr": 0.0005,
+      "gamma": 0.95
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -1768.6399999999976,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 34,
+    "algorithm": "reinforce",
+    "algo_run": 4,
+    "params": {
+      "lr": 0.001,
+      "gamma": 0.95
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -3254.0449999999983,
+    "avg_eval_length": 418.4,
+    "gridlock_rate": 0.3
+  },
+  {
+    "global_run": 35,
+    "algorithm": "reinforce",
+    "algo_run": 5,
+    "params": {
+      "lr": 0.005,
+      "gamma": 0.95
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -1147.3700000000003,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0
+  },
+  {
+    "global_run": 36,
+    "algorithm": "reinforce",
+    "algo_run": 6,
+    "params": {
+      "lr": 0.0001,
+      "gamma": 0.99
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -2694.82,
+    "avg_eval_length": 62.65,
+    "gridlock_rate": 1.0
+  },
+  {
+    "global_run": 37,
+    "algorithm": "reinforce",
+    "algo_run": 7,
+    "params": {
+      "lr": 0.0003,
+      "gamma": 0.99
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -2479.8549999999996,
+    "avg_eval_length": 50.15,
+    "gridlock_rate": 1.0
+  },
+  {
+    "global_run": 38,
+    "algorithm": "reinforce",
+    "algo_run": 8,
+    "params": {
+      "lr": 0.0005,
+      "gamma": 0.99
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -2459.919999999999,
+    "avg_eval_length": 50.25,
+    "gridlock_rate": 1.0
+  },
+  {
+    "global_run": 39,
+    "algorithm": "reinforce",
+    "algo_run": 9,
+    "params": {
+      "lr": 0.001,
+      "gamma": 0.99
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -2655.3949999999995,
+    "avg_eval_length": 52.75,
+    "gridlock_rate": 1.0
+  },
+  {
+    "global_run": 40,
+    "algorithm": "reinforce",
+    "algo_run": 10,
+    "params": {
+      "lr": 0.005,
+      "gamma": 0.99
+    },
+    "timesteps": 50000,
+    "eval_episodes": 20,
+    "status": "ok",
+    "avg_eval_reward": -2472.8900000000003,
+    "avg_eval_length": 54.5,
+    "gridlock_rate": 1.0
+  }
+]

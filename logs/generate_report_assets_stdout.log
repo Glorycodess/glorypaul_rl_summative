@@ -1,0 +1,36 @@
+Loading sweep results...
+  best dqn: {'lr': 0.001, 'gamma': 0.95} (reward -740.5, gridlock 0%)
+  best ppo: {'lr': 0.0003, 'clip': 0.3} (reward -768.0, gridlock 0%)
+  best a2c: {'lr': 0.005, 'n_steps': 5} (reward -886.4, gridlock 0%)
+  best reinforce: {'lr': 0.005, 'gamma': 0.95} (reward -1147.4, gridlock 0%)
+
+Writing hyperparameter tables...
+  dqn: assets/tables/dqn_hyperparameter_table.md, assets/tables/dqn_hyperparameter_table.csv
+  ppo: assets/tables/ppo_hyperparameter_table.md, assets/tables/ppo_hyperparameter_table.csv
+  a2c: assets/tables/a2c_hyperparameter_table.md, assets/tables/a2c_hyperparameter_table.csv
+  reinforce: assets/tables/reinforce_hyperparameter_table.md, assets/tables/reinforce_hyperparameter_table.csv
+  summary: assets/tables/summary_comparison.md
+
+Retraining best configs with logging enabled (for training curves)...
+  retraining dqn: {'lr': 0.001, 'gamma': 0.95}...
+  retraining ppo: {'lr': 0.0003, 'clip': 0.3}...
+  retraining a2c: {'lr': 0.005, 'n_steps': 5}...
+  retraining reinforce: {'lr': 0.005, 'gamma': 0.95}...
+
+Building plots 1-4 (training curves)...
+  assets/plots/01_reward_curves_grid.png
+  assets/plots/02_dqn_loss.png
+  assets/plots/03_entropy_curves.png
+  assets/plots/04_convergence_comparison.png
+
+Running generalization test (30 episodes/model, randomized start)...
+  dqn: reward -924.6, length 500.0, gridlock 0%
+  ppo: reward -986.0, length 500.0, gridlock 0%
+  a2c: reward -1073.2, length 500.0, gridlock 0%
+  reinforce: reward -1345.6, length 500.0, gridlock 0%
+
+  assets/plots/05_generalization_test.png
+  assets/tables/generalization_test.md
+  logs/generalization_results.json
+
+Done.

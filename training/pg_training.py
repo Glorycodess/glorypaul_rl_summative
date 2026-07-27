@@ -36,17 +36,6 @@ def build_model(algorithm, env):
         return A2C("MlpPolicy", env, verbose=1, tensorboard_log=TENSORBOARD_LOGS["a2c"])
 
     if algorithm == "reinforce":
-        # SB3 has no native REINFORCE, so this approximates vanilla Monte-Carlo
-        # policy gradient (REINFORCE with a value-function baseline) by
-        # collapsing PPO's update to a single unclipped policy-gradient step:
-        #   - batch_size == n_steps, n_epochs=1: one gradient step per rollout,
-        #     computed while the policy still matches the one that generated
-        #     the data, so the PPO probability ratio is ~1 by construction and
-        #     the clipped surrogate objective reduces to plain REINFORCE.
-        #   - clip_range=10.0: set high enough to never bind, since clipping
-        #     is exactly what distinguishes PPO's update from REINFORCE's.
-        #   - gae_lambda=1.0: the advantage reduces to the full Monte-Carlo
-        #     return minus baseline, instead of PPO's default bootstrapped GAE.
         return PPO(
             "MlpPolicy",
             env,

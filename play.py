@@ -12,14 +12,14 @@ import argparse
 from stable_baselines3 import PPO, A2C, DQN
 
 from environment.custom_env import TrafficSignalEnv
-from environment.rendering import TrafficRenderer
+from environment.rendering import TrafficRenderer, DEFAULT_LIVE_FPS
 
 DEFAULT_MODEL = "models/pg/ppo_baseline"
 
 ALGO_CLASSES = {
     "ppo": PPO,
     "a2c": A2C,
-    "reinforce": PPO,  # "reinforce" is trained as a specially-configured PPO; same load class.
+    "reinforce": PPO,
     "dqn": DQN,
 }
 
@@ -42,7 +42,7 @@ def main():
         help="SB3 algorithm class to load --model with (default: inferred from the model path)",
     )
     parser.add_argument("--episodes", type=int, default=1)
-    parser.add_argument("--fps", type=int, default=10)
+    parser.add_argument("--fps", type=int, default=DEFAULT_LIVE_FPS, help="playback frame rate for the live window")
     args = parser.parse_args()
 
     algorithm = args.algorithm or infer_algorithm(args.model)
