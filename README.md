@@ -41,11 +41,19 @@ in sync with the environment's observations — used by `play.py` and
 
 ## Setup
 
+Prerequisites: [`uv`](https://docs.astral.sh/uv/getting-started/installation/)
+installed, and Python 3.11+ (uv will fetch a matching interpreter
+automatically if you don't have one).
+
 ```
+git clone https://github.com/Glorycodess/glorypaul_rl_summative.git
+cd glorypaul_rl_summative
 uv sync
 uv run main.py
 ```
 
+`git clone` downloads the repository; `cd` into it before running anything
+else below, since every command assumes it's run from the project root.
 `uv sync` installs the locked dependency set (Gymnasium, Stable-Baselines3,
 Panda3D, PyTorch, TensorBoard, Matplotlib) into `.venv`. `uv run main.py` is
 a smoke test that just prints a hello-world line — use it to confirm the
