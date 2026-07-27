@@ -307,13 +307,13 @@ class TrafficRenderer(ShowBase):
         return np_
 
     def _build_signals(self):
-        stalk = ROAD_HALF_WIDTH + 1.5
-        median_offset = 0.35
+        stalk = STOP_LINE_DIST
+        side_offset = ROAD_HALF_WIDTH + SIDEWALK_WIDTH + 0.4
         specs = {
-            "N": (-median_offset, stalk),
-            "S": (median_offset, -stalk),
-            "E": (stalk, -median_offset),
-            "W": (-stalk, median_offset),
+            "N": (-side_offset, stalk),
+            "S": (side_offset, -stalk),
+            "E": (stalk, -side_offset),
+            "W": (-stalk, side_offset),
         }
         housing_z = SIGNAL_POLE_HEIGHT + SIGNAL_HOUSING_SIZE / 2.0
         light_z = SIGNAL_POLE_HEIGHT + SIGNAL_HOUSING_SIZE + SIGNAL_LIGHT_SIZE / 2.0
