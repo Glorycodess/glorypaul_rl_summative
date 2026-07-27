@@ -340,8 +340,8 @@ class TrafficRenderer(ShowBase):
         return node
 
     def _build_hud(self):
-        panel_left, panel_right = -1.78, -0.58
-        panel_top, panel_bottom = 1.0, 0.06
+        panel_left, panel_right = -1.78, -1.00
+        panel_top, panel_bottom = 1.0, 0.40
 
         self.hud_root = self.aspect2d.attachNewNode("hud")
 
@@ -352,11 +352,11 @@ class TrafficRenderer(ShowBase):
             pos=(0, 0, 0),
         )
 
-        text_x = panel_left + 0.08
-        line_height = 0.08
-        y = [panel_top - 0.11]
+        text_x = panel_left + 0.05
+        line_height = 0.05
+        y = [panel_top - 0.068]
 
-        def add_line(scale=0.05, fg=HUD_TEXT_COLOR):
+        def add_line(scale=0.031, fg=HUD_TEXT_COLOR):
             node = OnscreenText(
                 text="",
                 pos=(text_x, y[0]),
@@ -372,25 +372,25 @@ class TrafficRenderer(ShowBase):
         self.hud_step_text = add_line()
         self.hud_phase_text = add_line()
 
-        y[0] -= 0.02
-        bar_x = text_x + 0.34
-        self.hud_bar_max_width = panel_right - bar_x - 0.08
-        bar_height = 0.04
+        y[0] -= 0.014
+        bar_x = text_x + 0.21
+        self.hud_bar_max_width = panel_right - bar_x - 0.05
+        bar_height = 0.025
 
         self.hud_queue_texts = {}
         self.hud_bar_fills = {}
         for d in DIRECTIONS:
             line_y = y[0]
-            self.hud_queue_texts[d] = add_line(scale=0.048)
-            self._make_2d_rect(self.hud_root, bar_x, line_y + 0.015, self.hud_bar_max_width, bar_height, (0.3, 0.3, 0.3, 0.8))
-            self.hud_bar_fills[d] = self._make_2d_rect(self.hud_root, bar_x, line_y + 0.015, 0.001, bar_height, HUD_GREEN)
+            self.hud_queue_texts[d] = add_line(scale=0.03)
+            self._make_2d_rect(self.hud_root, bar_x, line_y + 0.01, self.hud_bar_max_width, bar_height, (0.3, 0.3, 0.3, 0.8))
+            self.hud_bar_fills[d] = self._make_2d_rect(self.hud_root, bar_x, line_y + 0.01, 0.001, bar_height, HUD_GREEN)
 
-        y[0] -= 0.02
-        self.hud_step_reward_text = add_line(scale=0.048)
-        self.hud_episode_reward_text = add_line(scale=0.048)
+        y[0] -= 0.014
+        self.hud_step_reward_text = add_line(scale=0.03)
+        self.hud_episode_reward_text = add_line(scale=0.03)
 
-        y[0] -= 0.02
-        self.hud_status_text = add_line(scale=0.052, fg=HUD_GREEN)
+        y[0] -= 0.014
+        self.hud_status_text = add_line(scale=0.032, fg=HUD_GREEN)
 
     def _update_hud(self, observation, action, step_count, max_steps, reward, gridlock_threshold):
         queue_lengths = {d: observation[i] for i, d in enumerate(DIRECTIONS)}
