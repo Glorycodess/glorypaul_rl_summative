@@ -588,8 +588,9 @@ class TrafficRenderer(ShowBase):
             step_count += 1
             self.episode_reward += reward
 
-            self._update_hud(obs, action, step_count, max_steps, reward, env.gridlock_threshold)
-            self.sync(obs, action, dt)
+            rendered_action = info.get("effective_action", action)
+            self._update_hud(obs, rendered_action, step_count, max_steps, reward, env.gridlock_threshold)
+            self.sync(obs, rendered_action, dt)
 
             if screenshot_dir and step_count % screenshot_every == 0:
                 self.screenshot(os.path.join(screenshot_dir, f"frame_{step_count:04d}.png"))

@@ -2,6 +2,8 @@ import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
 
+MIN_PHASE_DURATION = 15
+
 
 class TrafficSignalEnv(gym.Env):
     metadata = {"render_modes": ["human"], "render_fps": 10}
@@ -50,6 +52,7 @@ class TrafficSignalEnv(gym.Env):
 
         self.gridlock_threshold = 20
         self.max_steps = 500
+        self.min_phase_duration = MIN_PHASE_DURATION
 
     def reset(self, seed=None, options=None, randomize_start=False):
         super().reset(seed=seed)
@@ -75,16 +78,25 @@ class TrafficSignalEnv(gym.Env):
         prev_action = self.current_phase
         prev_queue_lengths = {d: len(self.queues[d]) for d in self.directions}
 
-        self._update_phase(action)
-        self._clear_vehicles(action)
+        effective_action = action
+        if action != self.current_phase and self.time_in_phase < self.min_phase_duration:
+            effective_action = self.current_phase
 
-        reward = self._calculate_reward(action, prev_action, prev_queue_lengths)
+        self._update_phase(effective_action)
+        self._clear_vehicles(effective_action)
+
+        reward = self._calculate_reward(effective_action, prev_action, prev_queue_lengths)
 
         observation = self._get_observation()
         terminated = self._check_gridlock()
         truncated = self.current_step >= self.max_steps
 
-        info = {"gridlock": terminated}
+        info = {
+            "gridlock": terminated,
+            "requested_action": int(action),
+            "effective_action": int(effective_action),
+            "phase_switch_blocked": bool(action != effective_action),
+        }
 
         return observation, reward, terminated, truncated, info
 
