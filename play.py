@@ -14,7 +14,7 @@ from stable_baselines3 import PPO, A2C, DQN
 from environment.custom_env import TrafficSignalEnv
 from environment.rendering import TrafficRenderer, DEFAULT_LIVE_FPS
 
-DEFAULT_MODEL = "models/pg/ppo_baseline"
+DEFAULT_MODEL = "models/pg/ppo_best_v3"
 
 ALGO_CLASSES = {
     "ppo": PPO,
