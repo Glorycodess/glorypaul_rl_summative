@@ -17,6 +17,12 @@ rewarded for avoiding it.
 
 ## Environment
 
+![Traffic signal environment rendered live by TrafficRenderer](logs/renders/before_after/ppo_v3_hold_demo/step_016_phase1.png)
+
+*The intersection mid-episode: HUD (top-left) shows step/episode count, active
+phase, per-direction queue bars, reward, and gridlock status; four traffic
+signals and color-coded queued vehicles are visible on the road itself.*
+
 `environment/custom_env.py` defines `TrafficSignalEnv`, a custom
 `gymnasium.Env` for one intersection with four approaches (N, S, E, W).
 
@@ -133,18 +139,38 @@ length, and average reward, writing the full per-episode breakdown to
 
 ## Watching a trained agent live
 
+**The simplest way to run it:**
+
 ```
-uv run python play.py                                     # ppo_best_v3 (default, final model), live window, ~10 fps
-uv run python play.py --model models/dqn/dqn_best --algorithm dqn
-uv run python play.py --episodes 3 --fps 15
+uv run python play.py
 ```
 
-Defaults to `models/pg/ppo_best_v3` (the recommended, final model — see
-Results below) inferred as a PPO model; pass `--model` to point at any
-saved `.zip` (baseline or `*_best`) and `--algorithm {ppo,a2c,reinforce,dqn}`
-if it can't be inferred from the path. `--episodes` (default `1`) sets how
-many full episodes to play; `--fps` (default `10`) sets the playback speed
-of the live Panda3D window.
+With no arguments, this opens a live Panda3D window and plays **one
+episode** of the current default model, **`models/pg/ppo_best_v3`** (the
+recommended, final model — see Results below), at **10 fps**.
+
+**Flags** (exactly as defined in `play.py`'s argparse setup):
+
+| Flag | Default | What it does |
+|---|---|---|
+| `--model` | `models/pg/ppo_best_v3` | Path to a trained SB3 model `.zip`, **without** the `.zip` extension |
+| `--algorithm` | inferred from `--model`'s path | Which SB3 class to load the model with — one of `ppo`, `a2c`, `reinforce`, `dqn` |
+| `--episodes` | `1` | How many full episodes to play in the live window |
+| `--fps` | `10` | Playback frame rate of the live window |
+
+`--algorithm` only needs to be set explicitly if it can't be guessed from
+the `--model` path (`infer_algorithm()` looks for `dqn`/`a2c`/`reinforce`/`ppo`
+as a substring of the path and falls back to `ppo`).
+
+**Example commands:**
+
+```
+uv run python play.py
+uv run python play.py --episodes 5
+uv run python play.py --model models/pg/ppo_best_v3 --episodes 5
+uv run python play.py --fps 5
+uv run python play.py --model models/dqn/dqn_best --algorithm dqn
+```
 
 ## Tests
 
@@ -212,6 +238,22 @@ algorithms eliminate gridlock entirely (0% vs. the random policy's 96%) and
 run the full 500-step episode. `assets/tables/generalization_test.md`
 re-evaluates each best model from a randomized (non-empty) starting queue
 state and shows the same ranking holds up, at a uniformly higher wait cost.
+
+![Training reward curves — best config per algorithm](assets/plots/01_reward_curves_grid.png)
+
+*All four algorithms climb from a very negative random-start reward to a
+stable, near-zero-queue policy within 50,000 timesteps.*
+
+![Convergence comparison — smoothed episode reward across algorithms](assets/plots/04_convergence_comparison.png)
+
+*DQN and PPO converge fastest and most stably; A2C plateaus early at a worse
+reward, and REINFORCE stays noisy throughout training.*
+
+![Generalization test — empty vs. randomized start states](assets/plots/05_generalization_test.png)
+
+*Re-evaluating each best model from a randomized, non-empty starting queue
+raises the wait cost but preserves the same algorithm ranking (0% gridlock
+across the board).*
 
 ## Project structure
 
