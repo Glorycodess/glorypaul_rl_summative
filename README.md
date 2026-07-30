@@ -134,16 +134,17 @@ length, and average reward, writing the full per-episode breakdown to
 ## Watching a trained agent live
 
 ```
-uv run python play.py                                     # PPO baseline, live window, ~10 fps
+uv run python play.py                                     # ppo_best_v3 (default, final model), live window, ~10 fps
 uv run python play.py --model models/dqn/dqn_best --algorithm dqn
 uv run python play.py --episodes 3 --fps 15
 ```
 
-Defaults to `models/pg/ppo_baseline` inferred as a PPO model; pass
-`--model` to point at any saved `.zip` (baseline or `*_best`) and
-`--algorithm {ppo,a2c,reinforce,dqn}` if it can't be inferred from the
-path. `--episodes` (default `1`) sets how many full episodes to play;
-`--fps` (default `10`) sets the playback speed of the live Panda3D window.
+Defaults to `models/pg/ppo_best_v3` (the recommended, final model — see
+Results below) inferred as a PPO model; pass `--model` to point at any
+saved `.zip` (baseline or `*_best`) and `--algorithm {ppo,a2c,reinforce,dqn}`
+if it can't be inferred from the path. `--episodes` (default `1`) sets how
+many full episodes to play; `--fps` (default `10`) sets the playback speed
+of the live Panda3D window.
 
 ## Tests
 
@@ -161,8 +162,41 @@ sync, and a short synced episode without needing a live window.
 
 ## Results
 
-Best saved model per algorithm vs. the random-policy baseline (50
-episodes each; see `logs/random_baseline_official.json` and
+**Recommended model: `models/pg/ppo_best_v3.zip`** — this is what `play.py`
+loads by default. It's PPO retrained with a hard 15-step minimum phase
+duration (`MIN_PHASE_DURATION` in `environment/custom_env.py`) on top of
+heavier switch/all-red penalties, so the signal now holds each phase for a
+genuine minimum stretch instead of flickering between phases. Evaluated
+over 50 episodes (see `logs/ppo_three_way_comparison.json`):
+
+| Metric | Value |
+|---|---:|
+| Avg. reward | -6747.7 |
+| Avg. episode length | 500.0 |
+| Gridlock rate | 0% |
+| Avg. phase switches / episode | 31.0 |
+
+That reward is lower than earlier PPO iterations below, but that's
+expected, not a regression: switching is now actively discouraged and
+partially blocked outright, so the reward number isn't comparable across
+these three configs — phase-switch count is the metric that reflects the
+actual goal:
+
+| Model | Config | Avg. reward | Avg. episode length | Gridlock rate | Avg. switches/episode |
+|---|---|---:|---:|---:|---:|
+| `ppo_best` | sweep-tuned (lr=0.0003, clip=0.3), original reward weights | -780.0 | 500.0 | 0% | 179.5 |
+| `ppo_best_v2` | heavier switch/all-red penalties | -3250.6 | 500.0 | 0% | 79.8 |
+| `ppo_best_v3` (recommended) | heavier penalties + 15-step minimum phase duration | -6747.7 | 500.0 | 0% | **31.0** |
+
+`ppo_baseline`, `ppo_best`, and `ppo_best_v2` are kept in `models/pg/` as
+earlier iterations for historical/comparison context, not deleted — see
+`logs/reward_reweight_comparison.json` for the `ppo_best` → `ppo_best_v2`
+reward reweighting comparison.
+
+Separately, the original hyperparameter sweep compared all four algorithms
+against a random-policy baseline (50 episodes each; predates the
+`ppo_best_v2`/`ppo_best_v3` reward changes above, so treat it as its own
+snapshot — see `logs/random_baseline_official.json` and
 `assets/tables/summary_comparison.md`):
 
 | Method | Key hyperparameters | Avg. reward | Avg. episode length | Gridlock rate |
@@ -178,11 +212,6 @@ algorithms eliminate gridlock entirely (0% vs. the random policy's 96%) and
 run the full 500-step episode. `assets/tables/generalization_test.md`
 re-evaluates each best model from a randomized (non-empty) starting queue
 state and shows the same ranking holds up, at a uniformly higher wait cost.
-
-`models/pg/ppo_best_v2.zip` is a separate experimental PPO model trained
-with heavier phase-switch penalties (see `logs/reward_reweight_comparison.json`
-for the before/after comparison); it is not part of the sweep and isn't
-included in the table above.
 
 ## Project structure
 
