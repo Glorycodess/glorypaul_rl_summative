@@ -1,0 +1,26 @@
+{
+  "ppo_best": {
+    "avg_eval_reward": -779.9540000000027,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0,
+    "avg_switches_per_episode": 179.54,
+    "avg_blocked_switch_attempts_per_episode": 0.0
+  },
+  "ppo_best_v2": {
+    "avg_eval_reward": -3250.569999999998,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0,
+    "avg_switches_per_episode": 79.82,
+    "avg_blocked_switch_attempts_per_episode": 0.0
+  },
+  "ppo_best_v3": {
+    "avg_eval_reward": -6747.654,
+    "avg_eval_length": 500.0,
+    "gridlock_rate": 0.0,
+    "avg_switches_per_episode": 31.0,
+    "avg_blocked_switch_attempts_per_episode": 351.32
+  },
+  "training_seconds_v3": 15.220593929290771,
+  "timesteps": 50000,
+  "eval_episodes": 50
+}
